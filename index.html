@@ -84,15 +84,25 @@
         </div>
     </div>
 
-    <div class="glass-card">
-        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-            <h5 class="fw-bold mb-0">Manajemen Stok Real-time</h5>
+   <div class="glass-card">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h5 class="fw-bold mb-0">❤️ Manajemen Stok Real-time</h5>
+        
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-success rounded-pill px-3 shadow-sm border-0" 
+                    style="background-color: #2c3e50; font-size: 0.85rem;" 
+                    data-bs-toggle="modal" data-bs-target="#modalTambah">
+                <i class="bi bi-plus-lg"></i> Tambah Barang
+            </button>
+            
             <div class="position-relative">
-                <input type="text" id="searchBox" class="form-control rounded-pill border-0 shadow-sm px-4" placeholder="Cari barang..." onkeyup="searchBarang()">
+                <input type="text" id="searchBox" class="form-control rounded-pill shadow-sm" 
+                       style="width: 160px; font-size: 0.85rem;" placeholder="Cari barang...">
             </div>
         </div>
-        
-        <div class="table-responsive">
+    </div>
+    
+    <div class="table-responsive">
             <table class="table align-middle">
                 <thead>
                     <tr class="text-muted small">
@@ -128,7 +138,39 @@
         </div>
     </div>
 </div>
-
+<div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header bg-light" style="border-radius: 20px 20px 0 0;">
+        <h5 class="modal-title fw-bold">📦 Tambah Barang Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Nama Barang</label>
+          <input type="text" id="newNama" class="form-control rounded-3" placeholder="Contoh: EPSON 003 - KUNING">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Jumlah Stok</label>
+          <input type="number" id="newStok" class="form-control rounded-3" placeholder="0">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Satuan</label>
+          <select id="newSatuan" class="form-control rounded-3">
+            <option value="BOTOL">BOTOL</option>
+            <option value="RIM">RIM</option>
+            <option value="PCS">PCS</option>
+            <option value="BOX">BOX</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-toggle="modal">Batal</button>
+        <button type="button" class="btn btn-primary rounded-pill px-4" onclick="simpanBaru()" style="background-color: #2c3e50;">Simpan Data</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
     // Load data dari LocalStorage
     let atkList = JSON.parse(localStorage.getItem('atkDataSelong')) || [];
@@ -140,7 +182,46 @@
         document.getElementById('totalStock').innerText = total;
         localStorage.setItem('atkDataSelong', JSON.stringify(atkList));
     }
+function simpanBaru() {
+    const nama = document.getElementById('newNama').value;
+    const stok = document.getElementById('newStok').value;
+    const satuan = document.getElementById('newSatuan').value;
 
+    // Validasi input
+    if (!nama || !stok) {
+        alert("Nama dan Stok tidak boleh kosong!");
+        return;
+    }
+
+    // Masukkan ke database lokal (atkList)
+    const dataBaru = {
+        nama: nama.toUpperCase(),
+        stok: parseInt(stok),
+        satuan: satuan
+    };
+
+    atkList.push(dataBaru);
+    
+    // Simpan permanen ke browser
+    localStorage.setItem('atkDataSelong', JSON.stringify(atkList));
+    
+    // Catat ke riwayat aktivitas
+    addHistory(nama.toUpperCase(), 'Tambah', stok);
+
+    // Update tampilan tabel dan angka-angka di atas
+    displayTable();
+    updateStats();
+
+    // Tutup jendela pop-up dan bersihkan form
+    const modalElement = document.getElementById('modalTambah');
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    modal.hide();
+    
+    document.getElementById('newNama').value = '';
+    document.getElementById('newStok').value = '';
+
+    alert("✅ Barang berhasil ditambahkan!");
+}
     // Fungsi Riwayat
     function addHistory(name, action, qty) {
         const entry = {
