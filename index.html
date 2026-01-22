@@ -3,158 +3,386 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gudang ATK</title>
+    <title>Inventori ATK - Smart Pastel</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+
     <style>
-        body { background-color: #fdfbfb; font-family: 'Quicksand', sans-serif; }
-        .bg-pastel-blue { background-color: #d4eaf7; color: #4a90e2; border-radius: 20px; }
-        .bg-pastel-green { background-color: #e2f0cb; color: #7cb342; border-radius: 20px; }
-        .glass-card { background: white; border-radius: 25px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); border: 1px solid #f1f1f1; }
-        /* Style Tombol Tambah Kurang */
-        .btn-qty { 
-            width: 35px; height: 35px; border-radius: 10px; border: none; 
-            font-weight: bold; font-size: 1.2rem; transition: 0.2s;
-            display: inline-flex; align-items: center; justify-content: center;
-        }
-        .btn-minus { background-color: #ffdad9; color: #e57373; }
-        .btn-plus { background-color: #dcfce7; color: #15803d; }
-        .btn-qty:hover { transform: scale(1.1); opacity: 0.8; }
-        .stok-display { min-width: 50px; font-size: 1.1rem; font-weight: 700; color: #2c3e50; }
-        .low-stock { color: #e57373 !important; }
+        body { background-color: #fdfbfb; font-family: 'Plus Jakarta Sans', sans-serif; color: #4a4a4a; }
+        .navbar { background: #ffffff; border-bottom: 1px solid #f0f0f0; }
+        .navbar-brand { font-weight: 700; color: #ffb7b2 !important; }
+        .stat-card { border: none; border-radius: 25px; transition: transform 0.3s; }
+        .stat-card:hover { transform: translateY(-5px); }
+        .bg-pastel-blue { background-color: #d4eaf7; }
+        .bg-pastel-green { background-color: #e2f0cb; }
+        .bg-pastel-purple { background-color: #efdbff; }
+        .glass-card { background: white; border-radius: 30px; border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 10px 30px rgba(0,0,0,0.03); padding: 2rem; }
+        .btn-pastel { background-color: #ffb7b2; color: white; border: none; border-radius: 12px; padding: 10px 25px; font-weight: 600; transition: 0.3s; }
+        .btn-pastel:hover { background-color: #ff9a9e; color: white; transform: scale(1.02); }
+        
+        .qty-btn { width: 35px; height: 35px; border-radius: 10px; border: none; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .qty-btn-plus { background-color: #dcfce7; color: #15803d; }
+        .qty-btn-minus { background-color: #fee2e2; color: #b91c1c; }
+        .qty-btn:hover { transform: scale(1.1); opacity: 0.8; }
+        .stok-value { min-width: 50px; font-weight: 700; text-align: center; }
+        
+        /* Custom Scrollbar untuk Riwayat */
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #ffb7b2; border-radius: 10px; }
+
+        .badge-tambah { background-color: #dcfce7; color: #15803d; border-radius: 8px; padding: 5px 10px; font-size: 0.75rem; }
+        .badge-kurang { background-color: #fee2e2; color: #b91c1c; border-radius: 8px; padding: 5px 10px; font-size: 0.75rem; }
+        .badge-hapus { background-color: #f3f4f6; color: #4b5563; border-radius: 8px; padding: 5px 10px; font-size: 0.75rem; }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-light bg-white border-bottom py-3">
-    <div class="container">
-        <span class="navbar-brand fw-bold text-secondary"><i class="bi bi-box-seam-fill me-2 text-info"></i>GUDANG SELONG</span>
-        <button onclick="clearAllData()" class="btn btn-outline-danger btn-sm rounded-pill fw-bold">Reset Dashboard</button>
+<nav class="navbar py-3 mb-4">
+    <div class="container d-flex justify-content-between">
+        <span class="navbar-brand"><i class="bi bi-box-seam me-2"></i>Inventori ATK</span>
+        <button onclick="clearAllData()" class="btn btn-outline-danger border-0 rounded-4">
+            <i class="bi bi-eraser-fill me-1"></i> Bersihkan Data
+        </button>
     </div>
 </nav>
 
-<div class="container py-4">
-    <div class="row g-3 mb-4">
-        <div class="col-6">
-            <div class="p-4 bg-pastel-blue shadow-sm">
-                <small class="fw-bold opacity-75">JENIS BARANG</small>
+<div class="container pb-5">
+    <div class="row g-4 mb-5">
+        <div class="col-md-4">
+            <div class="card stat-card p-4 bg-pastel-blue">
+                <p class="mb-1 fw-bold opacity-75 text-uppercase small">Item Terdata</p>
                 <h2 class="fw-bold mb-0" id="totalItems">0</h2>
             </div>
         </div>
-        <div class="col-6">
-            <div class="p-4 bg-pastel-green shadow-sm">
-                <small class="fw-bold opacity-75">TOTAL STOK UNIT</small>
+        <div class="col-md-4">
+            <div class="card stat-card p-4 bg-pastel-green">
+                <p class="mb-1 fw-bold opacity-75 text-uppercase small">Total Stok</p>
                 <h2 class="fw-bold mb-0" id="totalStock">0</h2>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stat-card p-4 bg-pastel-purple">
+                <p class="mb-1 fw-bold opacity-75 text-uppercase small">Terakhir Update</p>
+                <h2 class="fw-bold mb-0" id="lastUpdate">-</h2>
             </div>
         </div>
     </div>
 
-    <div class="glass-card mb-4 text-center">
-        <h6 class="fw-bold mb-3">Upload File CSV Gudang</h6>
-        <div class="d-flex gap-2 justify-content-center">
-            <input type="file" id="csvFileInput" class="form-control w-50" accept=".csv">
-            <button onclick="importData()" class="btn btn-info text-white fw-bold px-4 rounded-pill">Update</button>
+    <div class="glass-card mb-5 text-center">
+        <h5 class="fw-bold mb-4">💖 Import Data Baru</h5>
+        <div class="row g-3 justify-content-center">
+            <div class="col-md-7">
+                <input type="file" id="csvFileInput" class="form-control rounded-4 shadow-sm border-0 p-3">
+            </div>
+            <div class="col-md-3">
+                <button onclick="importData()" class="btn-pastel w-100 h-100">Update Data</button>
+            </div>
         </div>
     </div>
 
-    <div class="glass-card">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="fw-bold mb-0">Kelola Stok ATK</h5>
-            <input type="text" id="searchBox" class="form-control w-25 rounded-pill" placeholder="Cari..." onkeyup="searchBarang()">
-        </div>
+   <div class="glass-card">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+        <h5 class="fw-bold mb-0">❤️ Manajemen Stok Real-time</h5>
         
-        <table class="table align-middle">
-            <thead>
-                <tr class="text-muted small">
-                    <th>NO</th>
-                    <th>NAMA BARANG</th>
-                    <th class="text-center">KONTROL STOK</th>
-                    <th>SATUAN</th>
-                    <th class="text-end">OPSI</th>
-                </tr>
-            </thead>
-            <tbody id="inventoryTable"></tbody>
-        </table>
+        <div class="d-flex align-items-center gap-2">
+            <button type="button" class="btn btn-success rounded-pill px-3 shadow-sm border-0" 
+                    style="background-color: #2c3e50; font-size: 0.85rem;" 
+                    data-bs-toggle="modal" data-bs-target="#modalTambah">
+                <i class="bi bi-plus-lg"></i> Tambah Barang
+            </button>
+            
+            <div class="position-relative">
+                <input type="text" id="searchBox" class="form-control rounded-pill shadow-sm" 
+                       style="width: 160px; font-size: 0.85rem;" placeholder="Cari barang...">
+            </div>
+        </div>
+    </div>
+    
+    <div class="table-responsive">
+            <table class="table align-middle">
+                <thead>
+                    <tr class="text-muted small">
+                        <th width="60px">NO</th>
+                        <th>NAMA BARANG</th>
+                        <th class="text-center" width="200px">KONTROL STOK</th>
+                        <th>SATUAN</th>
+                        <th class="text-end">AKSI</th>
+                    </tr>
+                </thead>
+                <tbody id="inventoryTable"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="glass-card mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="fw-bold mb-0">🕒 Riwayat Aktivitas</h5>
+            <button onclick="clearHistory()" class="btn btn-sm btn-link text-decoration-none text-muted">Hapus Log</button>
+        </div>
+        <div class="table-responsive custom-scroll" style="max-height: 350px; overflow-y: auto;">
+            <table class="table table-sm">
+                <thead>
+                    <tr class="text-muted small">
+                        <th>WAKTU</th>
+                        <th>BARANG</th>
+                        <th>AKSI</th>
+                        <th class="text-end">JUMLAH</th>
+                    </tr>
+                </thead>
+                <tbody id="historyTable"></tbody>
+            </table>
+        </div>
     </div>
 </div>
-
+<div class="modal fade" id="modalTambah" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg" style="border-radius: 20px;">
+      <div class="modal-header bg-light" style="border-radius: 20px 20px 0 0;">
+        <h5 class="modal-title fw-bold">📦 Tambah Barang Baru</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Nama Barang</label>
+          <input type="text" id="newNama" class="form-control rounded-3">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Jumlah Stok</label>
+          <input type="number" id="newStok" class="form-control rounded-3" placeholder="0">
+        </div>
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Satuan</label>
+          <select id="newSatuan" class="form-control rounded-3" placeholder="">
+            <option value="BOTOL">BOTOL</option>
+            <option value="RIM">RIM</option>
+            <option value="PCS">PCS</option>
+            <option value="BOX">BOX</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light rounded-pill px-4" data-bs-toggle="modal">Batal</button>
+        <button type="button" class="btn btn-primary rounded-pill px-4" onclick="simpanBaru()" style="background-color: #2c3e50;">Simpan Data</button>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
+    // Load data dari LocalStorage
     let atkList = JSON.parse(localStorage.getItem('atkDataSelong')) || [];
+    let historyList = JSON.parse(localStorage.getItem('atkHistoryLog')) || [];
 
     function updateStats() {
         document.getElementById('totalItems').innerText = atkList.length;
-        const total = atkList.reduce((acc, curr) => acc + (parseInt(curr.stok) || 0), 0);
+        const total = atkList.reduce((acc, curr) => acc + parseInt(curr.stok || 0), 0);
         document.getElementById('totalStock').innerText = total;
         localStorage.setItem('atkDataSelong', JSON.stringify(atkList));
     }
+function simpanBaru() {
+    const nama = document.getElementById('newNama').value;
+    const stok = document.getElementById('newStok').value;
+    const satuan = document.getElementById('newSatuan').value;
 
-    // FUNGSI UTAMA TAMBAH KURANG
-    function gantiQty(index, jumlah) {
-        let stokSekarang = parseInt(atkList[index].stok) || 0;
-        let stokBaru = stokSekarang + jumlah;
-        if (stokBaru < 0) stokBaru = 0;
-        atkList[index].stok = stokBaru.toString();
+    // Validasi input
+    if (!nama || !stok) {
+        alert("Nama dan Stok tidak boleh kosong!");
+        return;
+    }
+
+    // Masukkan ke database lokal (atkList)
+    const dataBaru = {
+        nama: nama.toUpperCase(),
+        stok: parseInt(stok),
+        satuan: satuan
+    };
+
+    atkList.push(dataBaru);
+    
+    // Simpan permanen ke browser
+    localStorage.setItem('atkDataSelong', JSON.stringify(atkList));
+    
+    // Catat ke riwayat aktivitas
+    addHistory(nama.toUpperCase(), 'Tambah', stok);
+
+    // Update tampilan tabel dan angka-angka di atas
+    displayTable();
+    updateStats();
+
+    // Tutup jendela pop-up dan bersihkan form
+    const modalElement = document.getElementById('modalTambah');
+    const modal = bootstrap.Modal.getInstance(modalElement);
+    modal.hide();
+    
+    document.getElementById('newNama').value = '';
+    document.getElementById('newStok').value = '';
+
+    alert("✅ Barang berhasil ditambahkan!");
+}
+    // Fungsi Riwayat
+    function addHistory(name, action, qty) {
+        const entry = {
+            time: new Date().toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit', second:'2-digit'}),
+            name: name,
+            action: action, // 'Tambah', 'Kurang', 'Hapus', 'Import'
+            qty: qty
+        };
+        historyList.unshift(entry);
+        if (historyList.length > 50) historyList.pop(); // Batasi 50 log
+        localStorage.setItem('atkHistoryLog', JSON.stringify(historyList));
+        displayHistory();
+    }
+
+    function displayHistory() {
+        const historyBody = document.getElementById('historyTable');
+        if (historyList.length === 0) {
+            historyBody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">Belum ada riwayat aktivitas</td></tr>';
+            return;
+        }
+        historyBody.innerHTML = historyList.map(h => {
+            let badgeClass = h.action === 'Tambah' ? 'badge-tambah' : (h.action === 'Hapus' ? 'badge-hapus' : 'badge-kurang');
+            return `
+                <tr class="small align-middle">
+                    <td class="text-muted" style="font-size: 0.75rem">${h.time}</td>
+                    <td><span class="fw-semibold">${h.name}</span></td>
+                    <td><span class="${badgeClass}">${h.action}</span></td>
+                    <td class="text-end fw-bold">${h.qty}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    function clearHistory() {
+        if(confirm("Hapus semua catatan riwayat?")) {
+            historyList = [];
+            localStorage.removeItem('atkHistoryLog');
+            displayHistory();
+        }
+    }
+
+    function changeQty(index, delta) {
+        let currentQty = parseInt(atkList[index].stok);
+        let newQty = currentQty + delta;
+        if (newQty < 0) newQty = 0;
+        
+        // Catat Riwayat
+        const action = delta > 0 ? "Tambah" : "Kurang";
+        addHistory(atkList[index].nama, action, Math.abs(delta));
+
+        atkList[index].stok = newQty.toString();
+        document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString('id-ID');
         displayTable();
     }
 
     function displayTable(data = atkList) {
         const tableBody = document.getElementById('inventoryTable');
         tableBody.innerHTML = '';
-        
         data.forEach((item, index) => {
             const originalIndex = atkList.findIndex(x => x.nama === item.nama);
-            const isLow = parseInt(item.stok) < 10;
-            
             tableBody.innerHTML += `
                 <tr>
                     <td class="text-muted fw-bold">${index + 1}</td>
-                    <td class="fw-bold">${item.nama}</td>
-                    <td class="text-center">
+                    <td class="fw-bold" style="color:#2c3e50">${item.nama}</td>
+                    <td>
                         <div class="d-flex align-items-center justify-content-center gap-3">
-                            <button onclick="gantiQty(${originalIndex}, -1)" class="btn-qty btn-minus">-</button>
-                            <span class="stok-display ${isLow ? 'low-stock' : ''}">${item.stok}</span>
-                            <button onclick="gantiQty(${originalIndex}, 1)" class="btn-qty btn-plus">+</button>
+                            <button onclick="changeQty(${originalIndex}, -1)" class="qty-btn qty-btn-minus"><i class="bi bi-dash-lg"></i></button>
+                            <span class="stok-value">${item.stok}</span>
+                            <button onclick="changeQty(${originalIndex}, 1)" class="qty-btn qty-btn-plus"><i class="bi bi-plus-lg"></i></button>
                         </div>
                     </td>
-                    <td class="text-muted small">${item.satuan}</td>
+                    <td><span class="text-muted small">${item.satuan}</span></td>
                     <td class="text-end">
-                        <button onclick="hapusItem(${originalIndex})" class="btn btn-sm text-danger"><i class="bi bi-trash3"></i></button>
+                        <button onclick="removeItem(${originalIndex})" class="btn btn-light btn-sm rounded-3 text-danger border-0">
+                            <i class="bi bi-trash3-fill"></i>
+                        </button>
                     </td>
-                </tr>`;
+                </tr>
+            `;
         });
         updateStats();
     }
 
     function importData() {
         const file = document.getElementById('csvFileInput').files[0];
-        if (!file) return alert("Pilih file dulu!");
+        if (!file) return alert("Pilih file CSV dulu!");
         const reader = new FileReader();
         reader.onload = function(e) {
             const rows = e.target.result.split(/\r?\n/);
             for (let i = 1; i < rows.length; i++) {
                 if (!rows[i].trim()) continue;
-                let cols = rows[i].split(rows[i].includes(';') ? ';' : ',');
+                const cols = rows[i].split(rows[i].includes(';') ? ';' : ',');
                 if (cols.length >= 2) {
-                    const name = cols[1].replace(/"/g, "").trim().toUpperCase();
+                    const name = cols[1].replace(/"/g, '').trim();
+                    const stock = cols[2] ? cols[2].replace(/"/g, '').trim() : "0";
+                    const unit = cols[3] ? cols[3].replace(/"/g, '').trim() : "PCS";
+                    
                     if (!atkList.some(item => item.nama === name)) {
-                        atkList.push({ nama: name, stok: cols[2] || "0", satuan: cols[3] || "-" });
+                        atkList.push({ nama: name, stok: stock, satuan: unit });
+                        addHistory(name, "Import", stock);
                     }
                 }
             }
+            document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString('id-ID');
             displayTable();
+            alert("Data berhasil diimport!");
         };
         reader.readAsText(file);
     }
 
-    function clearAllData() { if(confirm("Reset semua?")) { atkList = []; displayTable(); } }
+    function removeItem(index) {
+        if(confirm("Hapus item ini dari inventori?")) {
+            addHistory(atkList[index].nama, "Hapus", atkList[index].stok);
+            atkList.splice(index, 1);
+            displayTable();
+        }
+    }
+
+    function clearAllData() {
+        if(confirm("Peringatan: Ini akan menghapus SEMUA data barang!")) {
+            atkList = [];
+            displayTable();
+            localStorage.clear();
+            location.reload();
+        }
+    }
+
     function searchBarang() {
         const key = document.getElementById('searchBox').value.toLowerCase();
-        displayTable(atkList.filter(i => i.nama.toLowerCase().includes(key)));
+        const filtered = atkList.filter(i => i.nama.toLowerCase().includes(key));
+        displayTable(filtered);
     }
-    function hapusItem(index) { atkList.splice(index, 1); displayTable(); }
 
+    // Jalankan saat pertama kali buka
     displayTable();
+    displayHistory();
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script type="module">
+  // Salinan kode dari Firebase Console Anda di bawah ini
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSy...",
+    authDomain: "gudang-atk.firebaseapp.com",
+    projectId: "gudang-atk",
+    storageBucket: "gudang-atk.appspot.com",
+    messagingSenderId: "...",
+    appId: "..."
+  };
+
+  // Inisialisasi Firebase
+  const app = initializeApp(firebaseConfig);
+  // Hubungkan ke Database Firestore
+  const db = getFirestore(app);
+  
+  // Membuat database dapat diakses oleh fungsi JavaScript lain di file Anda
+  window.db = db;
 </script>
 </body>
-</html> 
+</html>
+
