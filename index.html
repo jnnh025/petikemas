@@ -86,12 +86,19 @@
 
     <div class="glass-card">
         <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
-            <h5 class="fw-bold mb-0">Manajemen Stok Real-time</h5>
-            <div class="d-flex justify-content-between align-items-center mb-3">
-    <h4>Manajemen Stok Real-time</h4>
-    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalTambah">
-        + Tambah Barang Baru
-    </button>
+            <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+        <h5 class="fw-bold mb-0">❤️ Manajemen Stok Real-time</h5>
+        
+        <div class="d-flex gap-2">
+            <button type="button" class="btn btn-success rounded-pill px-3 shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambah">
+                <i class="bi bi-plus-lg"></i> + Tambah Barang
+            </button>
+            
+            <div class="position-relative">
+                <input type="text" id="searchBox" class="form-control rounded-pill" placeholder="Cari barang...">
+            </div>
+        </div>
+    </div>
 </div>
             <div class="position-relative">
                 <input type="text" id="searchBox" class="form-control rounded-pill border-0 shadow-sm px-4" placeholder="Cari barang..." onkeyup="searchBarang()">
